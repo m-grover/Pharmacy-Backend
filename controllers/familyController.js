@@ -3,6 +3,7 @@ const db = require('../db');
 exports.addFamily = (req, res) => {
     const {
         head_name,
+        aadhar_number,
         address,
         religion,
         caste,
@@ -11,6 +12,7 @@ exports.addFamily = (req, res) => {
         total_members,
         family_type,
         eligible_couples,
+        family_planning_method,
         house_type,
         village,
         created_by
@@ -18,13 +20,15 @@ exports.addFamily = (req, res) => {
 
     const sql = `
         INSERT INTO families 
-        (head_name, address, religion, caste, occupation, marital_status,
-         total_members, family_type, eligible_couples, house_type, village, created_by)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (head_name, aadhar_number, address, religion, caste, occupation, marital_status,
+         total_members, family_type, eligible_couples, family_planning_method, house_type,
+         village, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.query(sql, [
         head_name,
+        aadhar_number,
         address,
         religion,
         caste,
@@ -33,6 +37,7 @@ exports.addFamily = (req, res) => {
         total_members,
         family_type,
         eligible_couples,
+        family_planning_method,
         house_type,
         village,
         created_by
