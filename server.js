@@ -1,3 +1,4 @@
+require("dotenv").config();
 const cors = require('cors');
 const express = require('express');
 const app = express();
@@ -11,6 +12,8 @@ const neonatalRoutes = require('./routes/neonatalRoutes');
 const postnatalRoutes = require('./routes/postnatalRoutes');
 const obstetricalRoutes = require('./routes/obstetricalRoutes');
 const childcareRoutes = require('./routes/childcareRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const db = require("./db");
 
 app.use(cors());
 app.use(express.json());
@@ -24,9 +27,19 @@ app.use('/api/neonatal', neonatalRoutes);
 app.use('/api/postnatal', postnatalRoutes);
 app.use('/api/obstetrical', obstetricalRoutes);
 app.use('/api/childcare', childcareRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 app.get('/', (req, res) => {
     res.send('Backend is running');
+});
+
+app.get("/test-db", (req, res) => {
+  db.query("SELECT 1", (err, result) => {
+    if (err) {
+      return res.status(500).send(err);
+    }
+    res.send("DB Working ✅");
+  });
 });
 
 app.listen(5000, () => {
