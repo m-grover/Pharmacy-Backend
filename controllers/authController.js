@@ -5,19 +5,28 @@ const bcrypt = require('bcrypt');
 /* SIGNUP */
 /* ============================= */
 exports.signup = async (req, res) => {
+  console.log("🔥 Signup API hit");
+  console.log("📦 Data received:", req.body);
+
   const { name, student_id, email, password } = req.body;
 
   if (!name || !student_id || !email || !password) {
+    console.log("❌ Missing fields");
     return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
     // Check duplicate student_id
     const checkSql = `SELECT user_id FROM users WHERE student_id = ? LIMIT 1`;
+
     db.query(checkSql, [student_id], async (checkErr, checkResult) => {
-      if (checkErr) return res.status(500).json({ message: "DB error" });
+      if (checkErr) {
+        console.error("❌ Check Query Error:", checkErr);
+        return res.status(500).json({ message: "DB error" });
+      }
 
       if (checkResult.length > 0) {
+        console.log("⚠️ Duplicate user");
         return res.status(409).json({ message: "Student ID already registered" });
       }
 
@@ -29,12 +38,19 @@ exports.signup = async (req, res) => {
       `;
 
       db.query(sql, [name, student_id, email, hashedPassword], (err, result) => {
-        if (err) return res.status(500).json({ message: "Signup failed" });
+        if (err) {
+          console.error("❌ Insert Error:", err);   // 🔥 THIS IS CRITICAL
+          return res.status(500).json({ message: "Signup failed", error: err });
+        }
+
+        console.log("✅ User inserted:", result);   // 🔥 CONFIRM INSERT
+
         res.json({ message: "User registered successfully" });
       });
     });
 
   } catch (err) {
+    console.error("❌ Server Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
