@@ -5,16 +5,23 @@ const bcrypt = require('bcrypt');
 /* SIGNUP */
 /* ============================= */
 exports.signup = async (req, res) => {
-  const { name, student_id, email, password, semester, area, supervisor } = req.body; // ✅ ADD 3
+  const { name, student_id, email, password, semester, area, supervisor } = req.body;
+
+  console.log("🔥 Signup API hit");
+  console.log("Data received:", req.body);
 
   if (!name || !student_id || !email || !password) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
+    // Check duplicate student_id
     const checkSql = `SELECT user_id FROM users WHERE student_id = ? LIMIT 1`;
     db.query(checkSql, [student_id], async (checkErr, checkResult) => {
-      if (checkErr) return res.status(500).json({ message: "DB error" });
+      if (checkErr) {
+        console.error("Check error:", checkErr);
+        return res.status(500).json({ message: "DB error during check" });
+      }
 
       if (checkResult.length > 0) {
         return res.status(409).json({ message: "Student ID already registered" });
@@ -25,18 +32,19 @@ exports.signup = async (req, res) => {
       const sql = `
         INSERT INTO users (name, student_id, email, password, role, semester, area, supervisor)
         VALUES (?, ?, ?, ?, 'student', ?, ?, ?)
-      `;  // ✅ added 3 columns
+      `;
 
       db.query(sql, [name, student_id, email, hashedPassword, semester, area, supervisor], (err, result) => {
         if (err) {
-          console.error("Insert error:", err); // ✅ log the actual error
-          return res.status(500).json({ message: "Signup failed" });
+          console.error("Insert error:", err); // ← this will show the REAL error in Render logs
+          return res.status(500).json({ message: "Signup failed", error: err.message });
         }
         res.json({ message: "User registered successfully" });
       });
     });
 
   } catch (err) {
+    console.error("Unexpected error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -75,12 +83,11 @@ exports.login = (req, res) => {
       });
     }
 
-    // ✅ Send role, name, user_id — all needed by frontend
     res.json({
       message: "Login successful",
       user_id:    user.user_id,
       name:       user.name,
-      role:       user.role,       // ✅ was missing before
+      role:       user.role,
       village:    village || user.village,
       student_id: user.student_id
     });
