@@ -5,52 +5,38 @@ const bcrypt = require('bcrypt');
 /* SIGNUP */
 /* ============================= */
 exports.signup = async (req, res) => {
-  console.log("🔥 Signup API hit");
-  console.log("📦 Data received:", req.body);
-
-  const { name, student_id, email, password } = req.body;
+  const { name, student_id, email, password, semester, area, supervisor } = req.body; // ✅ ADD 3
 
   if (!name || !student_id || !email || !password) {
-    console.log("❌ Missing fields");
     return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
-    // Check duplicate student_id
     const checkSql = `SELECT user_id FROM users WHERE student_id = ? LIMIT 1`;
-
     db.query(checkSql, [student_id], async (checkErr, checkResult) => {
-      if (checkErr) {
-        console.error("❌ Check Query Error:", checkErr);
-        return res.status(500).json({ message: "DB error" });
-      }
+      if (checkErr) return res.status(500).json({ message: "DB error" });
 
       if (checkResult.length > 0) {
-        console.log("⚠️ Duplicate user");
         return res.status(409).json({ message: "Student ID already registered" });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const sql = `
-        INSERT INTO users (name, student_id, email, password, role)
-        VALUES (?, ?, ?, ?, 'student')
-      `;
+        INSERT INTO users (name, student_id, email, password, role, semester, area, supervisor)
+        VALUES (?, ?, ?, ?, 'student', ?, ?, ?)
+      `;  // ✅ added 3 columns
 
-      db.query(sql, [name, student_id, email, hashedPassword], (err, result) => {
+      db.query(sql, [name, student_id, email, hashedPassword, semester, area, supervisor], (err, result) => {
         if (err) {
-          console.error("❌ Insert Error:", err);   // 🔥 THIS IS CRITICAL
-          return res.status(500).json({ message: "Signup failed", error: err });
+          console.error("Insert error:", err); // ✅ log the actual error
+          return res.status(500).json({ message: "Signup failed" });
         }
-
-        console.log("✅ User inserted:", result);   // 🔥 CONFIRM INSERT
-
         res.json({ message: "User registered successfully" });
       });
     });
 
   } catch (err) {
-    console.error("❌ Server Error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
