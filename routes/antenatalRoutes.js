@@ -3,13 +3,16 @@ const router = express.Router();
 
 const {
     saveAntenatal,
-    getAntenatalBySurveyId
+    getAntenatalBySurveyId,
+    updateAntenatal
 } = require('../controllers/antenatalControllers');
 
 /* ============================= */
 /* SAVE ANTENATAL */
 /* ============================= */
 router.post('/save', saveAntenatal);
+
+router.put('/update/:id', updateAntenatal);
 
 /* ============================= */
 /* GET BY SURVEY ID */
