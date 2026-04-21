@@ -23,7 +23,7 @@ exports.updateEconomic = (req, res) => {
     UPDATE economic_status SET
       family_income=?, income_source=?, house_ownership=?,
       land_ownership=?, assets=?, bpl=?, scheme=?
-    WHERE id=?
+    WHERE economic_id=?
   `;
 
   db.query(sql, [family_income, income_source, house_ownership, land_ownership, assets, bpl, scheme, id], (err) => {
