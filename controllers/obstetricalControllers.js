@@ -1,5 +1,9 @@
 const db = require('../db');
 
+// Helper: convert empty string / undefined to null for numeric DB columns
+const toInt   = v => (v === "" || v === undefined || v === null) ? null : parseInt(v, 10);
+const toFloat = v => (v === "" || v === undefined || v === null) ? null : parseFloat(v);
+
 exports.saveObstetrical = (req, res) => {
   const {
     survey_id, member_id, child_number, pregnancy, problem_full_term,
@@ -18,12 +22,30 @@ exports.saveObstetrical = (req, res) => {
   `;
 
   db.query(sql, [
-    survey_id, member_id, child_number, pregnancy, problem_full_term,
-    miscarriage, abortion, delivery_type, place_of_delivery, year_of_delivery,
-    type_of_delivery, sex_of_baby, outcome, still_baby, birth_weight,
-    present_status, cause_of_death, conducted_by, remarks
+    toInt(survey_id),
+    toInt(member_id),
+    toInt(child_number),
+    pregnancy,
+    problem_full_term,
+    miscarriage,
+    abortion,
+    delivery_type,
+    place_of_delivery,
+    toInt(year_of_delivery),     // INT column — must not be ""
+    type_of_delivery,
+    sex_of_baby,
+    outcome,
+    still_baby,
+    toFloat(birth_weight),       // DECIMAL column — must not be ""
+    present_status,
+    cause_of_death   || null,
+    conducted_by     || null,
+    remarks          || null,
   ], (err, result) => {
-    if (err) { console.error("Obstetrical DB Error:", err); return res.status(500).json({ message: "Database error" }); }
+    if (err) {
+      console.error("Obstetrical DB Error:", err);
+      return res.status(500).json({ message: "Database error", detail: err.message });
+    }
     res.status(200).json({ message: "Obstetrical record saved", id: result.insertId });
   });
 };
@@ -47,12 +69,28 @@ exports.updateObstetrical = (req, res) => {
   `;
 
   db.query(sql, [
-    pregnancy, problem_full_term, miscarriage, abortion, delivery_type,
-    place_of_delivery, year_of_delivery, type_of_delivery, sex_of_baby,
-    outcome, still_baby, birth_weight, present_status, cause_of_death,
-    conducted_by, remarks, id
+    pregnancy,
+    problem_full_term,
+    miscarriage,
+    abortion,
+    delivery_type,
+    place_of_delivery,
+    toInt(year_of_delivery),     // INT column
+    type_of_delivery,
+    sex_of_baby,
+    outcome,
+    still_baby,
+    toFloat(birth_weight),       // DECIMAL column
+    present_status,
+    cause_of_death || null,
+    conducted_by   || null,
+    remarks        || null,
+    toInt(id),
   ], (err) => {
-    if (err) { console.error("Obstetrical Update Error:", err); return res.status(500).json({ message: "Database error" }); }
+    if (err) {
+      console.error("Obstetrical Update Error:", err);
+      return res.status(500).json({ message: "Database error", detail: err.message });
+    }
     res.status(200).json({ message: "Obstetrical record updated", id: parseInt(id) });
   });
 };
@@ -60,45 +98,58 @@ exports.updateObstetrical = (req, res) => {
 // const db = require('../db');
 
 // exports.saveObstetrical = (req, res) => {
-
 //   const {
-//     survey_id, member_id, child_number,
-//     pregnancy, problem_full_term, miscarriage, abortion,
-//     delivery_type, place_of_delivery, year_of_delivery,
-//     type_of_delivery, sex_of_baby, outcome, still_baby,
-//     birth_weight, present_status, cause_of_death,
-//     conducted_by, remarks
+//     survey_id, member_id, child_number, pregnancy, problem_full_term,
+//     miscarriage, abortion, delivery_type, place_of_delivery, year_of_delivery,
+//     type_of_delivery, sex_of_baby, outcome, still_baby, birth_weight,
+//     present_status, cause_of_death, conducted_by, remarks
 //   } = req.body;
 
 //   const sql = `
 //     INSERT INTO obstetrical_records (
-//       survey_id, member_id, child_number,
-//       pregnancy, problem_full_term, miscarriage, abortion,
-//       delivery_type, place_of_delivery, year_of_delivery,
-//       type_of_delivery, sex_of_baby, outcome, still_baby,
-//       birth_weight, present_status, cause_of_death,
-//       conducted_by, remarks
-//     )
-//     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+//       survey_id, member_id, child_number, pregnancy, problem_full_term,
+//       miscarriage, abortion, delivery_type, place_of_delivery, year_of_delivery,
+//       type_of_delivery, sex_of_baby, outcome, still_baby, birth_weight,
+//       present_status, cause_of_death, conducted_by, remarks
+//     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 //   `;
 
 //   db.query(sql, [
-//     survey_id, member_id, child_number,
-//     pregnancy, problem_full_term, miscarriage, abortion,
-//     delivery_type, place_of_delivery, year_of_delivery,
-//     type_of_delivery, sex_of_baby, outcome, still_baby,
-//     birth_weight, present_status, cause_of_death,
-//     conducted_by, remarks
+//     survey_id, member_id, child_number, pregnancy, problem_full_term,
+//     miscarriage, abortion, delivery_type, place_of_delivery, year_of_delivery,
+//     type_of_delivery, sex_of_baby, outcome, still_baby, birth_weight,
+//     present_status, cause_of_death, conducted_by, remarks
 //   ], (err, result) => {
+//     if (err) { console.error("Obstetrical DB Error:", err); return res.status(500).json({ message: "Database error" }); }
+//     res.status(200).json({ message: "Obstetrical record saved", id: result.insertId });
+//   });
+// };
 
-//     if (err) {
-//       console.error("Obstetrical DB Error:", err);
-//       return res.status(500).json({ message: "Database error" });
-//     }
+// exports.updateObstetrical = (req, res) => {
+//   const { id } = req.params;
+//   const {
+//     pregnancy, problem_full_term, miscarriage, abortion, delivery_type,
+//     place_of_delivery, year_of_delivery, type_of_delivery, sex_of_baby,
+//     outcome, still_baby, birth_weight, present_status, cause_of_death,
+//     conducted_by, remarks
+//   } = req.body;
 
-//     res.status(200).json({
-//       message: "Obstetrical record saved",
-//       id: result.insertId
-//     });
+//   const sql = `
+//     UPDATE obstetrical_records SET
+//       pregnancy=?, problem_full_term=?, miscarriage=?, abortion=?,
+//       delivery_type=?, place_of_delivery=?, year_of_delivery=?, type_of_delivery=?,
+//       sex_of_baby=?, outcome=?, still_baby=?, birth_weight=?,
+//       present_status=?, cause_of_death=?, conducted_by=?, remarks=?
+//     WHERE id=?
+//   `;
+
+//   db.query(sql, [
+//     pregnancy, problem_full_term, miscarriage, abortion, delivery_type,
+//     place_of_delivery, year_of_delivery, type_of_delivery, sex_of_baby,
+//     outcome, still_baby, birth_weight, present_status, cause_of_death,
+//     conducted_by, remarks, id
+//   ], (err) => {
+//     if (err) { console.error("Obstetrical Update Error:", err); return res.status(500).json({ message: "Database error" }); }
+//     res.status(200).json({ message: "Obstetrical record updated", id: parseInt(id) });
 //   });
 // };
