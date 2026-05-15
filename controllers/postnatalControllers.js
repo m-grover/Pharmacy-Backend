@@ -5,7 +5,8 @@ exports.savePostnatal = (req, res) => {
     survey_id, member_id, delivery_date, delivery_time, place, conducted_by,
     membrane_rupture, labour_duration, hemorrhage, followup_date,
     breast_engorgement, nipple_condition, perineum_condition, discharge_pv,
-    personal_hygiene, diet_type, involution, any_complaint
+    personal_hygiene, diet_type, involution, any_complaint,
+    health_care_provided
   } = req.body;
 
   if (!delivery_date) return res.status(400).json({ message: "Delivery date is required" });
@@ -15,15 +16,15 @@ exports.savePostnatal = (req, res) => {
       survey_id, member_id, delivery_date, delivery_time, place, conducted_by,
       membrane_rupture, labour_duration, hemorrhage, followup_date,
       breast_engorgement, nipple_condition, perineum_condition, discharge_pv,
-      personal_hygiene, diet_type, involution, any_complaint
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      personal_hygiene, diet_type, involution, any_complaint, health_care_provided
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   db.query(sql, [
     survey_id, member_id, delivery_date, delivery_time, place, conducted_by,
     membrane_rupture, labour_duration, hemorrhage, followup_date,
     breast_engorgement, nipple_condition, perineum_condition, discharge_pv,
-    personal_hygiene, diet_type, involution, any_complaint
+    personal_hygiene, diet_type, involution, any_complaint, health_care_provided
   ], (err, result) => {
     if (err) { console.error("Postnatal DB Error:", err); return res.status(500).json({ message: "Database error" }); }
     res.status(200).json({ message: "Postnatal record saved", id: result.insertId });
@@ -36,7 +37,7 @@ exports.updatePostnatal = (req, res) => {
     delivery_date, delivery_time, place, conducted_by,
     membrane_rupture, labour_duration, hemorrhage, followup_date,
     breast_engorgement, nipple_condition, perineum_condition, discharge_pv,
-    personal_hygiene, diet_type, involution, any_complaint
+    personal_hygiene, diet_type, involution, any_complaint, health_care_provided
   } = req.body;
 
   const sql = `
@@ -44,7 +45,7 @@ exports.updatePostnatal = (req, res) => {
       delivery_date=?, delivery_time=?, place=?, conducted_by=?,
       membrane_rupture=?, labour_duration=?, hemorrhage=?, followup_date=?,
       breast_engorgement=?, nipple_condition=?, perineum_condition=?, discharge_pv=?,
-      personal_hygiene=?, diet_type=?, involution=?, any_complaint=?
+      personal_hygiene=?, diet_type=?, involution=?, any_complaint=?, health_care_provided=?
     WHERE id=?
   `;
 
@@ -52,7 +53,7 @@ exports.updatePostnatal = (req, res) => {
     delivery_date, delivery_time, place, conducted_by,
     membrane_rupture, labour_duration, hemorrhage, followup_date,
     breast_engorgement, nipple_condition, perineum_condition, discharge_pv,
-    personal_hygiene, diet_type, involution, any_complaint, id
+    personal_hygiene, diet_type, involution, any_complaint,health_care_provided, id
   ], (err) => {
     if (err) { console.error("Postnatal Update Error:", err); return res.status(500).json({ message: "Database error" }); }
     res.status(200).json({ message: "Postnatal record updated", id: parseInt(id) });
