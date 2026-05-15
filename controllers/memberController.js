@@ -25,8 +25,8 @@ exports.addMember = (req, res) => {
     `;
 
     db.query(memberSql, [
-      family_id, name, spouse, relation, aadhar_head, aadhar,
-      phone, sex, dob, age, diet, education, employment, income,
+      family_id, name, spouse || null, relation, aadhar_head, aadhar,
+      phone, sex, dob, age, diet, education, employment || null, income || null,
     ], (err, memberResult) => {
       if (err) { console.error("Member Insert Error:", err); return res.status(500).json({ error: err.message }); }
 
@@ -83,8 +83,8 @@ exports.updateMember = (req, res) => {
   `;
 
   db.query(memberSql, [
-    name, spouse, relation, phone, sex, dob, age,
-    diet, education, employment, income, id
+    name, spouse || null, relation, phone, sex, dob, age,
+    diet, education, employment || null, income || null, id
   ], (err) => {
     if (err) { console.error("Member Update Error:", err); return res.status(500).json({ error: err.message }); }
 
