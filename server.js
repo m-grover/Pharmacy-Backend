@@ -13,6 +13,7 @@ const postnatalRoutes = require('./routes/postnatalRoutes');
 const obstetricalRoutes = require('./routes/obstetricalRoutes');
 const childcareRoutes = require('./routes/childcareRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const familyNeedsRoutes = require('./routes/familyneedsRoutes');
 const db = require("./db");
 
 app.use(cors({
@@ -30,6 +31,7 @@ app.use('/api/postnatal', postnatalRoutes);
 app.use('/api/obstetrical', obstetricalRoutes);
 app.use('/api/childcare', childcareRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/familyneeds', familyNeedsRoutes);
 
 app.get('/', (req, res) => {
     res.send('Backend is running');
