@@ -82,7 +82,7 @@ exports.getClientDetails = (req, res) => {
   const memberSql = `
     SELECT m.*, c.height, c.weight, c.bmi, c.systolic, c.diastolic,
            c.sugar, c.hb, c.urine_sugar, c.urine_albumin,
-           c.smoke, c.alcohol, c.health_problem, c.communicable, c.non_communicable
+           c.smoke, c.alcohol, c.health_problem
     FROM members m
     LEFT JOIN clinical_data c ON c.member_id = m.member_id
     WHERE m.member_id = ?
