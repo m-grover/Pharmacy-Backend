@@ -268,12 +268,9 @@ exports.getFamilies = (req, res) => {
       f.village,
       f.total_members,
       f.created_at,
-      u.name AS conductedBy,
-      COUNT(DISTINCT m.member_id) AS memberCount
+      u.name AS conductedBy
     FROM families f
-    LEFT JOIN users u   ON u.user_id   = f.created_by
-    LEFT JOIN members m ON m.family_id = f.family_id
-    GROUP BY f.family_id
+    LEFT JOIN users u ON u.user_id = f.created_by
     ORDER BY f.created_at DESC
   `;
 
@@ -284,7 +281,7 @@ exports.getFamilies = (req, res) => {
       familyId:    row.family_id,
       familyHead:  row.head_name || "Unknown",
       village:     row.village   || "-",
-      members:     row.memberCount || row.total_members || 0,
+      members:     row.total_members || 0,
       visitDate:   row.created_at ? new Date(row.created_at).toISOString().split("T")[0] : "Unknown",
       conductedBy: row.conductedBy || "Unknown"
     }));
